@@ -1,1 +1,53 @@
+function abrirValvula(n) {
+  const valve = document.getElementById(`valve${n}`);
+  const alerta = document.getElementById(`alerta${n}`);
+  valve.textContent = "ABERTA";
+  valve.className = "valve-open";
+  alerta.textContent = "🚨 Emergência: Válvula de Segurança Aberta!";
+  alerta.style.backgroundColor = "#ff4d4d";
+}
+
+function fecharValvula(n) {
+  const valve = document.getElementById(`valve${n}`);
+  const alerta = document.getElementById(`alerta${n}`);
+  valve.textContent = "FECHADA";
+  valve.className = "valve-closed";
+  alerta.textContent = "Válvula fechada com segurança.";
+  alerta.style.backgroundColor = "#ccffcc";
+  setTimeout(() => {
+    alerta.textContent = "OK";
+    alerta.style.backgroundColor = "transparent";
+  }, 3000);
+}
+
+function updatePanel(n, temp, ph, nivel) {
+  document.getElementById(`temp${n}`).textContent = temp.toFixed(1);
+  document.getElementById(`ph${n}`).textContent = ph.toFixed(1);
+  document.getElementById(`nivel${n}`).textContent = nivel + "%";
+  document.getElementById(`liquid${n}`).style.height = nivel + "%";
+
+  const alerta = document.getElementById(`alerta${n}`);
+  if (temp > 40) {
+    alerta.textContent = "⚠️ Alerta: Temperatura Alta";
+    alerta.style.backgroundColor = "#ffcccc";
+  } else if (nivel < 30) {
+    alerta.textContent = "⚠️ Alerta: Volume Baixo";
+    alerta.style.backgroundColor = "#ffcccc";
+  } else {
+    alerta.textContent = "OK";
+    alerta.style.backgroundColor = "transparent";
+  }
+}
+
+async function obterDadosArduino() {
+  try {
+    const resposta = await fetch("http://192.168.4.1/dados"); // IP do Arduino
+    const dados = await resposta.json();
+    updatePanel(1, dados.temperatura, dados.ph, dados.nivel);
+  } catch (erro) {
+    console.error("Erro ao buscar dados do Arduino:", erro);
+  }
+}
+
+setInterval(obterDadosArduino, 5000); // Atualiza a cada 5 segundos
 
