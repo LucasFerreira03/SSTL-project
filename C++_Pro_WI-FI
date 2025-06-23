@@ -1,7 +1,7 @@
 #include <Adafruit_LiquidCrystal.h> // Biblioteca para LCD I2C
 #include <Servo.h>                  // Biblioteca para controle de servo motor
-#include <ESP8266WiFi.h>            // Biblioteca de conexão Wi-Fi para ESP8266
-#include <ESP8266WebServer.h>       // Biblioteca para criar servidor HTTP
+#include <WiFi.h>                   // Biblioteca para conexão Wi-Fi do ESP32
+#include <WebServer.h>              // Biblioteca para servidor HTTP
 
 Adafruit_LiquidCrystal lcd(0);      // Objeto para o display LCD
 Servo servo;                        // Objeto para o servo motor
@@ -10,46 +10,43 @@ Servo servo;                        // Objeto para o servo motor
 int baseTemp = 0;
 int celcius = 0;
 int baseph = 0;
-int TRIG = A3; 
-int ECO = A2;
+int TRIG = 32; // Pino de trigger
+int ECO = 33;  // Pino de echo
 int DURACION;
 int DISTANCIA;
 
 // ====== CONFIGURAÇÃO DE REDE Wi-Fi ======
-const char* ssid = "SEU_WIFI";         // Nome da sua rede Wi-Fi
-const char* password = "SUA_SENHA";    // Senha da sua rede Wi-Fi
-ESP8266WebServer server(80);           // Criação do servidor HTTP na porta 80
+const char* ssid = "SEU_WIFI";
+const char* password = "SUA_SENHA";
+WebServer server(80); // Criação do servidor HTTP
 
 void setup() {
-  // Configura os pinos dos sensores
-  pinMode(A0, INPUT);   // pH
-  pinMode(A1, INPUT);   // Temperatura
-  pinMode(TRIG, OUTPUT); 
-  pinMode(ECO, INPUT); 
-  Serial.begin(9600);   // Comunicação Serial
+  pinMode(34, INPUT); // pH
+  pinMode(35, INPUT); // Temperatura
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECO, INPUT);
+  Serial.begin(9600);
 
   // LEDs e atuadores
-  pinMode(2, OUTPUT);   // LED temperatura 1
-  pinMode(3, OUTPUT);   // LED temperatura 2
-  pinMode(4, OUTPUT);   // LED pH 1
-  pinMode(5, OUTPUT);   // LED pH 2
-  pinMode(6, OUTPUT);   // LED nível 1
-  pinMode(7, OUTPUT);   // LED nível 2
+  pinMode(2, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(18, OUTPUT);
+  pinMode(19, OUTPUT);
+  pinMode(21, OUTPUT);
 
-  lcd.begin(16, 2);     // Inicializa display LCD
-  servo.attach(8);      // Conecta o servo motor ao pino D8
+  lcd.begin(16, 2);
+  servo.attach(23); // Pino do servo no ESP32
 
-  // ==== Conecta ao Wi-Fi ====
   WiFi.begin(ssid, password);
   Serial.print("Conectando ao Wi-Fi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\nWi-Fi conectado. IP: ");
-  Serial.println(WiFi.localIP()); // Mostra IP local do ESP
+  Serial.println("\nWi-Fi conectado. IP:");
+  Serial.println(WiFi.localIP());
 
-  // ==== Rota HTTP "/dados" que responde com dados em JSON ====
   server.on("/dados", []() {
     String json = "{\"temperatura\":" + String(celcius) +
                   ",\"ph\":" + String(baseph) +
@@ -57,135 +54,69 @@ void setup() {
     server.send(200, "application/json", json);
   });
 
-  server.begin(); // Inicia o servidor
+  server.begin();
   Serial.println("Servidor HTTP iniciado.");
 }
 
 void loop() {
-  server.handleClient(); // Mantém o servidor respondendo as requisições
+  server.handleClient();
 
-  // === MONITORAMENTO DE TEMPERATURA ===
+  // === TEMPERATURA ===
   baseTemp = 40;
-  celcius = map(((analogRead(A1) - 20) * 3.04), 0, 1023, -40, 125); // Converte leitura para °C
-  Serial.print(celcius);
-  Serial.println("C");
+  celcius = map(((analogRead(35) - 20) * 3.04), 0, 4095, -40, 125);
+  Serial.print("Temperatura: ");
+  Serial.println(celcius);
 
-  // Controle de LEDs e válvula baseado na temperatura
   if (celcius < baseTemp) {
     digitalWrite(2, LOW);
-    digitalWrite(3, LOW);
-    servo.write(90); // Válvula fechada
-  }
-  if (celcius >= baseTemp && celcius < baseTemp + 80) {
+    digitalWrite(4, LOW);
+    servo.write(90);
+  } else if (celcius > baseTemp + 20) {
     digitalWrite(2, HIGH);
-    digitalWrite(3, LOW);
-  }
-  if (celcius > baseTemp + 10 && celcius < baseTemp + 150) {
-    digitalWrite(2, HIGH);
-    digitalWrite(3, HIGH);
-  }
-  if (celcius > baseTemp + 20 && celcius < baseTemp + 300) {
-    digitalWrite(2, HIGH);
-    digitalWrite(3, HIGH);
+    digitalWrite(4, HIGH);
     lcd.setCursor(1, 0);
     lcd.print("Perigo ");
     lcd.setCursor(1, 1);
     lcd.print("Temperatura");
     delay(2000);
     lcd.clear();
-  }
-  if (celcius > baseTemp + 20 && celcius < baseTemp + 600) {
-    digitalWrite(2, HIGH);
-    digitalWrite(3, HIGH);
-    lcd.setCursor(1, 0);
-    lcd.print("Aberto valvula ");
-    lcd.setCursor(1, 1);
-    lcd.print("de scape !!!");
-    delay(2000);
-    lcd.clear();
-    servo.write(0); // Abre válvula
-    delay(1000);
+    servo.write(0);
   }
 
-  // === MONITORAMENTO DE PH ===
-  baseph = 40; // Valor de referência para pH (pode ser ajustado)
-  celcius = map(((analogRead(A0) - 20) * 3.04), 0, 1023, -40, 125); // Reuso da variável celcius como pH
-  Serial.print(celcius);
-  Serial.println("C");
+  // === PH ===
+  baseph = 40;
+  celcius = map(((analogRead(34) - 20) * 3.04), 0, 4095, -40, 125);
+  Serial.print("PH: ");
+  Serial.println(celcius);
 
   if (celcius < baseph) {
-    digitalWrite(4, LOW);
     digitalWrite(5, LOW);
-    servo.write(90);
-  }
-  if (celcius >= baseph && celcius < baseph + 80) {
-    digitalWrite(4, HIGH);
-    digitalWrite(5, LOW);
-  }
-  if (celcius > baseph + 10 && celcius < baseph + 300) {
-    digitalWrite(4, HIGH);
+    digitalWrite(18, LOW);
+  } else if (celcius > baseph + 20) {
     digitalWrite(5, HIGH);
-  }
-  if (celcius > baseph + 20 && celcius < baseph + 600) {
-    digitalWrite(4, HIGH);
-    digitalWrite(5, HIGH);
+    digitalWrite(18, HIGH);
     lcd.setCursor(1, 0);
     lcd.print("Perigo ");
     lcd.setCursor(1, 1);
     lcd.print("PH");
     delay(2000);
     lcd.clear();
-  }
-  if (celcius > baseTemp + 20 && celcius < baseTemp + 600) {
-    digitalWrite(4, HIGH);
-    digitalWrite(5, HIGH);
-    lcd.setCursor(1, 0);
-    lcd.print("Aberto valvula ");
-    lcd.setCursor(1, 1);
-    lcd.print("de scape !!!");
-    delay(2000);
-    lcd.clear();
     servo.write(0);
-    delay(1000);
   }
 
-  // === MONITORAMENTO DE NÍVEL (Sensor Ultrassônico) ===
-  digitalWrite(TRIG, HIGH);  // Sinal de trigger
+  // === NÍVEL ===
+  digitalWrite(TRIG, HIGH);
   delay(10);
-  digitalWrite(TRIG, LOW);   // Encerra trigger
-
-  DURACION = pulseIn(ECO, HIGH);    // Lê tempo de retorno do sinal
-  DISTANCIA = DURACION / 58.2;      // Converte tempo em distância (cm)
-  Serial.println(DISTANCIA); 
+  digitalWrite(TRIG, LOW);
+  DURACION = pulseIn(ECO, HIGH);
+  DISTANCIA = DURACION / 58.2;
+  Serial.print("Distância: ");
+  Serial.println(DISTANCIA);
   delay(200);
 
-  // Controle dos LEDs e alerta com base na distância
-  if (DISTANCIA < 250) {
-    digitalWrite(6, LOW);
-    digitalWrite(7, LOW);
-    servo.write(90);
-  }
-  if (DISTANCIA < 200) {
-    digitalWrite(6, HIGH);
-    digitalWrite(7, HIGH);
-  }
-  if (DISTANCIA < 150) {
-    digitalWrite(6, HIGH);
-    digitalWrite(7, HIGH);
-  }
-  if (DISTANCIA < 100) {
-    digitalWrite(6, HIGH);
-    digitalWrite(7, HIGH);
-    lcd.setCursor(1, 0);
-    lcd.print("Perigo ");
-    lcd.setCursor(1, 1);
-    lcd.print("Volume do tanque");
-    delay(2000);
-    lcd.clear();
-  }
   if (DISTANCIA < 50) {
-    digitalWrite(4, HIGH);
-    digitalWrite(5, HIGH);
+    digitalWrite(19, HIGH);
+    digitalWrite(21, HIGH);
     lcd.setCursor(1, 0);
     lcd.print("Aberto valvula ");
     lcd.setCursor(1, 1);
@@ -196,5 +127,5 @@ void loop() {
     delay(1000);
   }
 
-  delay(1000); // Aguarda 1 segundo para nova leitura
+  delay(1000); // Delay entre leituras
 }
