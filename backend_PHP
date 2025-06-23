@@ -1,0 +1,46 @@
+<?php
+header('Content-Type: application/json');
+require_once 'conexao.php';
+
+$dados = json_decode(file_get_contents("php://input"), true);
+
+if (!$dados || !isset($dados['tanque_id'])) {
+    echo json_encode(['status' => 'erro', 'mensagem' => 'Dados inválidos.']);
+    exit;
+}
+
+$tanque_id = intval($dados['tanque_id']);
+$temperatura = floatval($dados['temperatura']);
+$ph = floatval($dados['ph']);
+$nivel = intval($dados['nivel']);
+
+// Inserir leitura
+$sql = "INSERT INTO leituras (tanque_id, temperatura, ph, nivel) VALUES (?, ?, ?, ?)";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("iddi", $tanque_id, $temperatura, $ph, $nivel);
+$stmt->execute();
+$leitura_id = $stmt->insert_id;
+
+// Verificação de alertas
+$alertas = [];
+
+if ($temperatura > 50) {
+    $alertas[] = ['tipo' => 'Temperatura Alta', 'descricao' => 'Temperatura acima do limite seguro.'];
+}
+if ($ph < 6.5 || $ph > 8.5) {
+    $alertas[] = ['tipo' => 'pH Crítico', 'descricao' => 'pH fora da faixa segura.'];
+}
+if ($nivel < 30) {
+    $alertas[] = ['tipo' => 'Nível Baixo', 'descricao' => 'Nível de líquido muito baixo.'];
+}
+
+// Inserir alertas se houver
+foreach ($alertas as $a) {
+    $sql = "INSERT INTO alertas (leitura_id, tipo_alerta, descricao) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iss", $leitura_id, $a['tipo'], $a['descricao']);
+    $stmt->execute();
+}
+
+echo json_encode(['status' => 'ok', 'leitura_id' => $leitura_id, 'alertas' => $alertas]);
+?>
