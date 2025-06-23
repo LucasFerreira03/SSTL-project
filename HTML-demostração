@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SSTL</title>
-  <!-- Fontes personalizadas -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -14,6 +13,7 @@
       margin: 0;
       padding: 20px;
     }
+
     h1 {
       text-align: center;
       font-family: 'Orbitron', sans-serif;
@@ -22,27 +22,7 @@
       color: #00bfff;
       margin-bottom: 30px;
     }
-    .tank h2 {
-      text-align: center;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      color: #1a1a1a;
-    }
-    .product-select {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .product-select label {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-    .product-select select {
-      padding: 4px 8px;
-      border-radius: 5px;
-      border: 1px solid #999;
-      font-size: 14px;
-    }
+
     .dashboard {
       display: flex;
       justify-content: center;
@@ -51,6 +31,7 @@
       max-width: 1200px;
       margin: auto;
     }
+
     .tank {
       background: #fff;
       color: #000;
@@ -59,6 +40,32 @@
       width: 300px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
+
+    .tank h2 {
+      text-align: center;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #1a1a1a;
+    }
+
+    .product-select {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .product-select label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .product-select select {
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid #999;
+      font-size: 14px;
+    }
+
     .tank-visual {
       height: 300px;
       border: 2px solid #333;
@@ -66,6 +73,7 @@
       position: relative;
       overflow: hidden;
     }
+
     .liquid {
       position: absolute;
       bottom: 0;
@@ -73,9 +81,14 @@
       background-color: #00bfff;
       transition: height 0.5s;
     }
+
     .status {
       margin-top: 20px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
     }
+
     .led {
       width: 20px;
       height: 20px;
@@ -83,9 +96,11 @@
       display: inline-block;
       margin-left: 10px;
     }
+
     .led.green { background: green; }
     .led.yellow { background: yellow; }
     .led.red { background: red; }
+
     .alert {
       background-color: #ffcccc;
       color: #000;
@@ -93,22 +108,27 @@
       border-left: 5px solid red;
       margin-top: 10px;
     }
+
     .valve-status {
       margin-top: 10px;
       font-weight: bold;
     }
+
     .valve-open {
       color: red;
     }
+
     .valve-closed {
       color: green;
     }
+
     .button-group {
       margin-top: 15px;
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
     }
+
     .emergency-button, .close-button {
       padding: 10px 20px;
       font-size: 14px;
@@ -117,128 +137,94 @@
       cursor: pointer;
       color: white;
     }
+
     .emergency-button {
       background-color: #c62828;
       box-shadow: 0 0 5px rgba(255,0,0,0.5);
     }
+
     .emergency-button:hover {
       background-color: #b71c1c;
     }
+
     .close-button {
       background-color: #2e7d32;
       box-shadow: 0 0 5px rgba(0,255,0,0.5);
     }
+
     .close-button:hover {
       background-color: #1b5e20;
+    }
+
+    /* Botões flutuantes no canto direito */
+    .sidebar-buttons {
+      position: fixed;
+      right: 20px;
+      bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sidebar-buttons button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+      transition: background 0.3s ease;
+    }
+
+    .sidebar-buttons button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
   <h1>SSTL</h1>
-  <div class="dashboard">
-    <!-- Tanque 1 -->
-    <div class="tank">
-      <h2>Tanque 1</h2>
-      <div class="product-select">
-        <label for="produto1">Produto:</label>
-        <select id="produto1">
-          <option>Ácido Sulfúrico</option>
-          <option>Soda Cáustica</option>
-          <option>Etanol</option>
-          <option>Água</option>
-          <option>Outro</option>
-        </select>
-      </div>
-      <div class="tank-visual"><div class="liquid" id="liquid1" style="height: 50%;"></div></div>
-      <div class="status">
-        <p>Temperatura: <span id="temp1">40</span>°C <span class="led red"></span></p>
-        <p>pH: <span id="ph1">7.0</span> <span class="led yellow"></span></p>
-        <p>Nível: <span id="nivel1">50%</span> <span class="led green"></span></p>
-        <div class="valve-status">Válvula: <span id="valve1" class="valve-closed">FECHADA</span></div>
-      </div>
-      <div class="alert" id="alerta1">⚠️ Alerta: Temperatura Alta</div>
-      <div class="button-group">
-        <button class="emergency-button" onclick="abrirValvula(1)">🔓 Abrir Válvula</button>
-        <button class="close-button" onclick="fecharValvula(1)">🔒 Fechar Válvula</button>
-      </div>
-    </div>
+  <div class="dashboard" id="dashboard"></div>
 
-    <!-- Tanque 2 -->
-    <div class="tank">
-      <h2>Tanque 2</h2>
-      <div class="product-select">
-        <label for="produto2">Produto:</label>
-        <select id="produto2">
-          <option>Ácido Sulfúrico</option>
-          <option>Soda Cáustica</option>
-          <option>Etanol</option>
-          <option>Água</option>
-          <option>Outro</option>
-        </select>
-      </div>
-      <div class="tank-visual"><div class="liquid" id="liquid2" style="height: 70%;"></div></div>
-      <div class="status">
-        <p>Temperatura: <span id="temp2">38</span>°C <span class="led red"></span></p>
-        <p>pH: <span id="ph2">6.8</span> <span class="led yellow"></span></p>
-        <p>Nível: <span id="nivel2">70%</span> <span class="led green"></span></p>
-        <div class="valve-status">Válvula: <span id="valve2" class="valve-closed">FECHADA</span></div>
-      </div>
-      <div class="alert" id="alerta2">OK</div>
-      <div class="button-group">
-        <button class="emergency-button" onclick="abrirValvula(2)">🔓 Abrir Válvula</button>
-        <button class="close-button" onclick="fecharValvula(2)">🔒 Fechar Válvula</button>
-      </div>
-    </div>
-
-    <!-- Tanque 3 -->
-    <div class="tank">
-      <h2>Tanque 3</h2>
-      <div class="product-select">
-        <label for="produto3">Produto:</label>
-        <select id="produto3">
-          <option>Ácido Sulfúrico</option>
-          <option>Soda Cáustica</option>
-          <option>Etanol</option>
-          <option>Água</option>
-          <option>Outro</option>
-        </select>
-      </div>
-      <div class="tank-visual"><div class="liquid" id="liquid3" style="height: 30%;"></div></div>
-      <div class="status">
-        <p>Temperatura: <span id="temp3">42</span>°C <span class="led red"></span></p>
-        <p>pH: <span id="ph3">7.2</span> <span class="led yellow"></span></p>
-        <p>Nível: <span id="nivel3">30%</span> <span class="led green"></span></p>
-        <div class="valve-status">Válvula: <span id="valve3" class="valve-closed">FECHADA</span></div>
-      </div>
-      <div class="alert" id="alerta3">⚠️ Alerta: Volume Baixo</div>
-      <div class="button-group">
-        <button class="emergency-button" onclick="abrirValvula(3)">🔓 Abrir Válvula</button>
-        <button class="close-button" onclick="fecharValvula(3)">🔒 Fechar Válvula</button>
-      </div>
-    </div>
+  <!-- Botões laterais -->
+  <div class="sidebar-buttons">
+    <button onclick="adicionarTanque()">➕ Adicionar Tanque</button>
+    <button onclick="removerTanque()">➖ Remover Tanque</button>
   </div>
 
   <script>
-    function abrirValvula(n) {
-      const valveSpan = document.getElementById("valve" + n);
-      valveSpan.textContent = "ABERTA";
-      valveSpan.className = "valve-open";
-      const alerta = document.getElementById("alerta" + n);
-      alerta.textContent = "🚨 Emergência: Válvula de Segurança Aberta!";
-      alerta.style.backgroundColor = "#ff4d4d";
-    }
+    let totalTanques = 0;
 
-    function fecharValvula(n) {
-      const valveSpan = document.getElementById("valve" + n);
-      valveSpan.textContent = "FECHADA";
-      valveSpan.className = "valve-closed";
-      const alerta = document.getElementById("alerta" + n);
-      alerta.textContent = "Válvula fechada com segurança.";
-      alerta.style.backgroundColor = "#ccffcc";
-      setTimeout(() => {
-        alerta.textContent = "OK";
-        alerta.style.backgroundColor = "transparent";
-      }, 3000);
+    function criarTanque(n) {
+      const tanque = document.createElement("div");
+      tanque.className = "tank";
+      tanque.id = "tanque" + n;
+      tanque.innerHTML = `
+        <h2>Tanque ${n}</h2>
+        <div class="product-select">
+          <label for="produto${n}">Produto:</label>
+          <select id="produto${n}">
+            <option>Ácido Sulfúrico</option>
+            <option>Soda Cáustica</option>
+            <option>Etanol</option>
+            <option>Água</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="tank-visual"><div class="liquid" id="liquid${n}" style="height: 50%;"></div></div>
+        <div class="status">
+          <p>Temperatura: <span id="temp${n}">0</span>°C <span class="led red"></span></p>
+          <p>pH: <span id="ph${n}">0.0</span> <span class="led yellow"></span></p>
+          <p>Nível: <span id="nivel${n}">0%</span> <span class="led green"></span></p>
+          <div class="valve-status">Válvula: <span id="valve${n}" class="valve-closed">FECHADA</span></div>
+        </div>
+        <div class="alert" id="alerta${n}">OK</div>
+        <div class="button-group">
+          <button class="emergency-button" onclick="abrirValvula(${n})">🔓 Abrir Válvula</button>
+          <button class="close-button" onclick="fecharValvula(${n})">🔒 Fechar Válvula</button>
+        </div>`;
+      document.getElementById("dashboard").appendChild(tanque);
     }
 
     function updatePanel(n, temp, ph, nivel) {
@@ -260,8 +246,46 @@
       }
     }
 
+    function abrirValvula(n) {
+      document.getElementById("valve" + n).textContent = "ABERTA";
+      document.getElementById("valve" + n).className = "valve-open";
+      const alerta = document.getElementById("alerta" + n);
+      alerta.textContent = "🚨 Emergência: Válvula de Segurança Aberta!";
+      alerta.style.backgroundColor = "#ff4d4d";
+    }
+
+    function fecharValvula(n) {
+      document.getElementById("valve" + n).textContent = "FECHADA";
+      document.getElementById("valve" + n).className = "valve-closed";
+      const alerta = document.getElementById("alerta" + n);
+      alerta.textContent = "Válvula fechada com segurança.";
+      alerta.style.backgroundColor = "#ccffcc";
+      setTimeout(() => {
+        alerta.textContent = "OK";
+        alerta.style.backgroundColor = "transparent";
+      }, 3000);
+    }
+
+    function adicionarTanque() {
+      totalTanques++;
+      criarTanque(totalTanques);
+    }
+
+    function removerTanque() {
+      if (totalTanques > 0) {
+        const tanque = document.getElementById("tanque" + totalTanques);
+        tanque.remove();
+        totalTanques--;
+      }
+    }
+
+    // Inicializa com 3 tanques
+    for (let i = 1; i <= 3; i++) {
+      adicionarTanque();
+    }
+
     setInterval(() => {
-      for (let i = 1; i <= 3; i++) {
+      for (let i = 1; i <= totalTanques; i++) {
         const temp = 35 + Math.round(Math.random() * 10);
         const ph = (6 + Math.random() * 2).toFixed(1);
         const nivel = Math.round(Math.random() * 100);
@@ -271,4 +295,3 @@
   </script>
 </body>
 </html>
-
