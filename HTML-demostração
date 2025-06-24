@@ -83,10 +83,13 @@
     }
 
     .status {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #f5f5f5;
+      margin-top: 10px;
+      padding: 15px;
+      background-color: transparent;
+      border: 2px solid #00bfff;
       border-radius: 8px;
+      text-align: center;
+      font-size: 1.1rem;
     }
 
     .led {
@@ -127,6 +130,7 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .emergency-button, .close-button {
@@ -156,7 +160,6 @@
       background-color: #1b5e20;
     }
 
-    /* Botões flutuantes no canto direito */
     .sidebar-buttons {
       position: fixed;
       right: 20px;
@@ -214,9 +217,9 @@
         </div>
         <div class="tank-visual"><div class="liquid" id="liquid${n}" style="height: 50%;"></div></div>
         <div class="status">
-          <p>Temperatura: <span id="temp${n}">0</span>°C <span class="led red"></span></p>
-          <p>pH: <span id="ph${n}">0.0</span> <span class="led yellow"></span></p>
-          <p>Nível: <span id="nivel${n}">0%</span> <span class="led green"></span></p>
+          <p><strong>Temperatura:</strong> <span id="temp${n}">0</span>°C <span class="led red"></span></p>
+          <p><strong>pH:</strong> <span id="ph${n}">0.0</span> <span class="led yellow"></span></p>
+          <p><strong>Nível:</strong> <span id="nivel${n}">0%</span> <span class="led green"></span></p>
           <div class="valve-status">Válvula: <span id="valve${n}" class="valve-closed">FECHADA</span></div>
         </div>
         <div class="alert" id="alerta${n}">OK</div>
@@ -279,7 +282,6 @@
       }
     }
 
-    // Inicializa com 3 tanques
     for (let i = 1; i <= 3; i++) {
       adicionarTanque();
     }
